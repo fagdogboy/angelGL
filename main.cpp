@@ -1,6 +1,14 @@
 #include <vulkan/vulkan.h>
 #define GLFW_INCLUDE_VULKAN
 
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
+VkWin32SurfaceCreateInfoKHR createInfo{};
+createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+createInfo.hwnd = glfwGetWin32Window(window);
+createInfo.hinstance = GetModuleHandle(nullptr);
+
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
@@ -234,7 +242,7 @@ private:
   void initWindow() {  
 
     glfwInit();
-    
+    x
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     
