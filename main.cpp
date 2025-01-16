@@ -5,10 +5,14 @@
 #include<string>
 #include<sstream>
 #include<cstring>
-#include<cmath>
+#include <cmath>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
-
+#define FOV_DEF 50.0f
 //#include "shader/shader.h"
 #include "newshader.h"
 #include "stb_image.h"
@@ -54,6 +58,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 int main() {
 
+  int frames_drawn = 0;
+  
   float vertices[] = {
     0.5f, -0.5f, 0.0f,   0.8f, 0.0f, 0.0f,  1.0f, 1.0f,
     -0.5f, -0.5f, 0.0f,  0.0f, 0.8f, 0.0f,  1.0f, 0.0f,
@@ -134,27 +140,64 @@ int main() {
 
   mainShader.setInt("texture1", 0);
   mainShader.setInt("texture2", 1);
+
+
+  // random shit for render loop
+  unsigned int transformLoc = glGetUniformLocation(mainShader.ID, "transform");
   
   while(!glfwWindowShouldClose(window))
     {
       processInput(window);
 
+      float timeValue = glfwGetTime();
+      float greenValue = std::abs(sin(timeValue) * 360);
+
+     
+      //model matrix
+      glm::mat4 model = glm::mat4(1.0f);
+      model = glm::rotate(model, glm::radians(greenValue), glm::vec3(1.0f, 0.0f, 0.0f));
+
+      //view matrix
+      glm::mat4 view = glm::mat4(1.0f);
+      // note that we're translating the scene in the reverse direction of where we want to move
+      view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f)); 
+      
+      //projection matrix
+      int height = 0 ,width = 0;
+      glfwGetWindowSize(window, &height, &width);
+      glm::mat4 proj = glm::perspective(glm::radians(FOV_DEF), (float)width/(float)height, 0.1f, 100.0f);
+      
+      //end math
+      // sending data
+
+      int modelLoc = glGetUniformLocation(mainShader.ID, "model");
+      glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+      int viewLoc = glGetUniformLocation(mainShader.ID, "view");
+      glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+      int projectionLoc = glGetUniformLocation(mainShader.ID, "projection");
+      glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(proj));
+
+
+
+      
       mainShader.use();
       
       glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
 
-      float timeValue = glfwGetTime();
-      float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-
       int vertexColorLocation = glGetUniformLocation(mainShader.ID, "ourColor");
       glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);      
       
       glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+      //for arrays and indices
+
+      //glDrawArrays(GL_TRIANGLES, 0, 36);
+      //for arrays
       
       glfwSwapBuffers(window);
       glfwPollEvents();    
-      
+
+      //      frames_drawn++;
     }
 
   glfwTerminate();
