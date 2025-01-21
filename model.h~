@@ -1,0 +1,44 @@
+#pragma once
+
+#include<fstream> 
+#include <glm/ext/vector_float3.hpp>
+#include<iostream>
+#include "./glad/glad.h"
+#include<GLFW/glfw3.h>
+#include<string>
+#include<sstream>
+#include<cstring>
+#include <cmath>
+#include <random>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include "newshader.h"
+#include <vector>
+#include <strstream>
+
+#include "model.h"
+
+struct model_data {
+
+  std::vector<float> model_vertices;
+  std::vector<int> model_indices;
+  
+};
+
+class entity {
+ public:
+
+  model_data data = {{},{}};
+  
+  entity() {
+    data.model_vertices = {};
+    data.model_indices = {};
+  }
+
+  void updatepos() {
+
+
+  }
+  
+};
